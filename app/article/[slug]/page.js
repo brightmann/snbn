@@ -1,5 +1,4 @@
 import { Fragment } from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
 
 import {
@@ -13,9 +12,16 @@ import styles from '../../../styles/post.module.css';
 export async function generateStaticParams() {
   const database = await getDatabase();
   return database?.map((page) => {
-    const slug = page.properties.Slug?.formula?.string;
+    const slug = page.properties.Slug?.rich_text?.[0]?.plain_text;
     return ({ id: page.id, slug });
   });
+}
+
+export async function generateMetadata({ params }) {
+  const page = await getPageFromSlug(params?.slug);
+  return {
+    title: page.properties?.Title?.title?.[0]?.plain_text ?? 'Notion Next.js blog',
+  };
 }
 
 export default async function Page({ params }) {
@@ -28,11 +34,6 @@ export default async function Page({ params }) {
 
   return (
     <div>
-      <Head>
-        <title>{page.properties.Title?.title[0].plain_text}</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <article className={styles.container}>
         <h1 className={styles.name}>
           <Text title={page.properties.Title?.title} />

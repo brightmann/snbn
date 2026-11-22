@@ -82,7 +82,7 @@ export default async function Page() {
                 year: 'numeric',
               },
             );
-            const slug = post.properties?.Slug?.rich_text[0].text.content;
+            const slug = post.properties?.Slug?.rich_text?.[0]?.plain_text ?? '';
             return (
               <li key={post.id} className={styles.post}>
                 <h3 className={styles.postTitle}>

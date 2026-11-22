@@ -4,6 +4,55 @@ import Link from 'next/link';
 import Text from '../text';
 import styles from '../../styles/post.module.css';
 
+function toYouTubeEmbed(url) {
+  try {
+    const u = new URL(url);
+    let id = '';
+    if (u.hostname.includes('youtube.com')) {
+      id = u.searchParams.get('v') || '';
+      if (!id && u.pathname.startsWith('/embed/')) id = u.pathname.split('/')[2] || '';
+      if (!id && u.pathname.startsWith('/shorts/')) id = u.pathname.split('/')[2] || '';
+    } else if (u.hostname === 'youtu.be') {
+      id = u.pathname.slice(1);
+    }
+    return id ? `https://www.youtube.com/embed/${id}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderVideo(url) {
+  if (!url) return null;
+  const embedUrl = toYouTubeEmbed(url);
+  if (embedUrl) {
+    return (
+      <iframe
+        src={embedUrl}
+        title="Video"
+        width="100%"
+        height="360"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+  if (/\.(mp4|webm|mov|m4v)(\?|$)/i.test(url)) {
+    // eslint-disable-next-line jsx-a11y/media-has-caption
+    return <video src={url} controls width="100%" />;
+  }
+  return (
+    <iframe
+      src={url}
+      title="Embedded content"
+      width="100%"
+      height="360"
+      frameBorder="0"
+      allowFullScreen
+    />
+  );
+}
+
 export function renderBlock(block) {
   const { type, id } = block;
   const value = block[type];
@@ -154,6 +203,23 @@ export function renderBlock(block) {
     }
     case 'column': {
       return <div>{block.children.map((child) => renderBlock(child))}</div>;
+    }
+    case 'video': {
+      const videoUrl = value.type === 'external' ? value.external.url : value.file.url;
+      const caption = value.caption ? value.caption[0]?.plain_text : '';
+      return (
+        <figure>
+          {renderVideo(videoUrl)}
+          {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      );
+    }
+    case 'embed': {
+      return (
+        <figure>
+          {renderVideo(value.url)}
+        </figure>
+      );
     }
     default:
       return `❌ Unsupported block (${
