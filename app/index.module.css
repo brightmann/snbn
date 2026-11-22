@@ -64,3 +64,44 @@
   margin-bottom: 12px;
   opacity: 0.65;
 }
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 40px 0 60px;
+}
+
+.pagerLink {
+  padding: 6px 10px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+}
+
+.pagerCurrent {
+  padding: 6px 10px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.pagerDisabled {
+  padding: 6px 10px;
+  opacity: 0.4;
+}
+
+.pagerEllipsis {
+  padding: 6px 2px;
+  opacity: 0.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pagerLink {
+    border-color: #343539;
+  }
+
+  .pagerCurrent {
+    border-color: #fff;
+  }
+}
